@@ -1,19 +1,28 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { Component } from 'react';
+import { StyleSheet, Text, Button, Image, View, LayoutAnimation } from 'react-native';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createAppContainer } from 'react-navigation';
+import Splash from './screens/splash'
+import home from './screens/home'
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+const AppNavigator = createStackNavigator({
+  Splash: {
+    screen: Splash,
+    navigationOptions: {
+      headerShown: false,
+    }
   },
+  Home: {
+    screen: home,
+    navigationOptions: {
+      headerLeft: () => null,
+      gestureEnabled: false,
+      title: "Sign In"
+    }
+  }
+
 });
+
+
+export default createAppContainer(AppNavigator)
