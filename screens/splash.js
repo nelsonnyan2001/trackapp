@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, Button, Image, View, LayoutAnimation } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 export default class Splash extends Component {
-    
+
     constructor(props) {
         super(props);
         this.state = {
@@ -26,22 +27,37 @@ export default class Splash extends Component {
         if (!this.state.timeoutDone) {
             return (
                 <View style={styles.container}>
-                    <Image style={styles.img}
-                        source={require('../assets/logo.png')}
-                        resizeMode={"contain"} />
+                    <View style={styles.topContainer}>
+                        <Image style={styles.img}
+                            source={require('../assets/logo.png')}
+                            resizeMode={"contain"} />
+                        <Text style = {styles.smalltext}> 
+                            a pet project
+                        </Text>
+                    </View>
                 </View>
             );
         }
         else {
             return (
                 <View style={styles.container}>
-                    <Image style={styles.img}
-                        source={require('../assets/logo.png')}
-                        resizeMode={"contain"} />
-                    <Button title="go."
-                        onPress={() => this.props.navigation.navigate('Home')}>
+                    <View style={styles.topContainer}>
+                        <Image style={styles.img}
+                            source={require('../assets/logo.png')}
+                            resizeMode={"contain"} />
+                        <Text style={styles.smalltext}>
+                            by @nelly_skrt
+                        </Text>
+                    </View>
+                    <View style = {styles.btn}>
+                        <TouchableOpacity
+                            onPress={() => this.props.navigation.navigate('Home')}>
+                            <Text style={styles.btnText}>
+                                go.
+                            </Text>
 
-                    </Button>
+                        </TouchableOpacity>
+                    </View>
 
                 </View>
             )
@@ -54,7 +70,6 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "column",
         justifyContent: "space-evenly",
-        alignItems: "center",
         flex: 1
     },
     img: {
@@ -63,6 +78,23 @@ const styles = StyleSheet.create({
     },
     btn: {
         display: "none"
+    },
+    topContainer: {
+        justifyContent: "space-evenly",
+        alignItems: "center",
+    },
+    smalltext: {
+        fontFamily: 'Gill Sans',
+    },
+    btnText: {
+        fontFamily: 'Gill Sans',
+        fontSize: 18,
+        color: "blue"
+    },
+    btn: {
+        justifyContent: "center",
+        alignItems: "center"
+
     }
 });
 
