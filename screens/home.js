@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { Alert, StyleSheet, Text, TouchableWithoutFeedback, Keyboard, Image, View, KeyboardAvoidingView, LayoutAnimation } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableWithoutFeedback, Keyboard, Image, View, KeyboardAvoidingView, LayoutAnimation, ActivityIndicator, StatusBar } from 'react-native';
 import { Input } from 'react-native-elements'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Firebase from '../database/firebase_config';
 
 export default class home extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -14,13 +13,15 @@ export default class home extends Component {
             email: "",
             password: "",
             confirmPassword: "",
-            incorrectPassword: " "
+            incorrectPassword: " ",
+            isLoading: false
         };
     };
 
-
     componentDidMount() {
-
+        Firebase.auth().signOut().then().catch((error) => {
+            console.log(error)
+        });
     }
 
     switchFunc() {
@@ -33,7 +34,6 @@ export default class home extends Component {
             this.setState({ form: "signIn" })
             this.setState({ incorrectPassword: " " })
         }
-        console.log(this.state.form)
     }
 
     emailChanged(email) {
@@ -57,33 +57,13 @@ export default class home extends Component {
             this.setState({ incorrectPassword: "Password must be longer than 8 characters." })
         }
         else {
-            signInPromise = new Promise((resolve, reject) => {
-                Firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).catch(function (error) {
-                    console.log(error.code)
-                    switch (error.code) {
-                        case "auth/invalid-email":
-                            that.setState({ incorrectPassword: "Enter a correct email address." })
-                            break;
-                        case "auth/user-not-found":
-                            that.setState({ incorrectPassword: "There is no user with that email address." })
-                            break;
-                        case "auth/wrong-password":
-                            that.setState({ incorrectPassword: "Incorrect password." })
-                            break;
-
-                        default:
-                            that.setState({ incorrectPassword: "Something went wrong. Please try again." })
-                            break;
-                    }
-                });
-                resolve()
-            })
-
-            signInPromise.then(() => {
+            that.setState({ isLoading: !that.state.isLoading })
+            Firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+                that.setState({ isLoading: !that.state.isLoading })
                 let user = Firebase.auth().currentUser
                 Alert.alert(
                     "Signed in!",
-                    "You've been signed in as user " + user.email,
+                    "You are signed in with " + user.email,
                     [
                         {
                             text: "Cancel",
@@ -94,24 +74,25 @@ export default class home extends Component {
                     ],
                     { cancelable: false }
                 );
-            }, notSignedIn => {
-                Alert.alert(
-                    "Uh-oh!",
-                    "You haven't been signed in",
-                    [
-                        {
-                            text: "Please try again.",
-                            onPress: () => console.log("Cancel Pressed"),
-                            style: "Go back"
-                        }
-                    ],
-                    { cancelable: false }
-                );
-            }).catch(error => {
-                console.log("There was an error : " + error)
-            })
-        }
+            }).catch((error) => {
+                that.setState({ isLoading: !that.state.isLoading })
+                switch (error.code) {
+                    case "auth/invalid-email":
+                        that.setState({ incorrectPassword: "Enter a correct email address." })
+                        break;
+                    case "auth/user-not-found":
+                        that.setState({ incorrectPassword: "There is no user with that email address." })
+                        break;
+                    case "auth/wrong-password":
+                        that.setState({ incorrectPassword: "Incorrect password." })
+                        break;
 
+                    default:
+                        that.setState({ incorrectPassword: "Something went wrong. Please try again." })
+                        break;
+                }
+            });
+        }
     }
 
     signUpClicked() {
@@ -132,8 +113,13 @@ export default class home extends Component {
             this.setState({ incorrectPassword: "Passwords do not match." })
         }
         else {
-            Firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch(function (error) {
-                console.log(error.code)
+            that.setState({ isLoading: !that.state.isLoading })
+            Firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).then(() => {
+                that.setState({ isLoading: !that.state.isLoading })
+                this.switchFunc()
+                that.setState({ incorrectPassword: "You have successfully signed up!" })
+            }).catch((error) => {
+                that.setState({ isLoading: !that.state.isLoading })
                 if (error.code === "auth/email-already-in-use") {
                     that.setState({ incorrectPassword: "An account with that email already exists." })
                 }
@@ -142,8 +128,6 @@ export default class home extends Component {
                 }
             });
         }
-
-
     }
 
     render() {
@@ -152,6 +136,7 @@ export default class home extends Component {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                     <KeyboardAvoidingView style={styles.container}
                         behavior="padding">
+                        <StatusBar hidden={true} />
                         <View style={styles.topContainer}>
                             <Image style={styles.img}
                                 source={require('../assets/logo.png')}
@@ -165,12 +150,12 @@ export default class home extends Component {
                                         iconStyle: { marginHorizontal: 5 },
                                         color: "grey"
                                     }}
+                                    textContentType="username"
                                     autoCapitalize="none"
                                     placeholder="Email"
                                     style={styles.iconStyling}
                                     onChangeText={email => this.emailChanged(email)}
-                                    onSubmitEditing={() => { this.password.focus(); }}>
-                                </Input>
+                                    onSubmitEditing={() => { this.password.focus(); }} />
                                 <Input
                                     leftIcon={{
                                         type: 'simple-line-icon',
@@ -179,30 +164,36 @@ export default class home extends Component {
                                         size: 20,
                                         color: "grey"
                                     }}
+                                    textContentType="password"
                                     autoCapitalize="none"
                                     secureTextEntry={true}
                                     onChangeText={password => this.passwordChanged(password)}
                                     ref={(input) => { this.password = input; }}
-                                    placeholder="Password">
-                                </Input>
+                                    placeholder="Password" />
+
                                 <Text style={styles.incorrect}>
                                     {this.state.incorrectPassword}
                                 </Text>
                             </View>
                             <TouchableOpacity style={styles.signInBtn}
+                                disabled={this.state.isLoading}
                                 onPress={() => this.signInClicked()}>
                                 <Text style={styles.signInTxt}>
                                     Sign In
                                 </Text>
                             </TouchableOpacity>
+                            <View style={styles.activityIndicator}>
+                                {this.state.isLoading ? <ActivityIndicator /> : null}
+                            </View>
                         </View>
                         <View style={styles.signUpContainer}>
                             <Text style={styles.minorStyling}>Not part of the track family?</Text>
                             <TouchableOpacity
-                                onPress={() => this.switchFunc()}>
+                                onPress={() => this.switchFunc()}
+                                disabled={this.state.isLoading}>
                                 <Text style={styles.btnStyling}>
                                     Sign Up
-                        </Text>
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </KeyboardAvoidingView>
@@ -227,12 +218,12 @@ export default class home extends Component {
                                         iconStyle: { marginHorizontal: 5 },
                                         color: "grey"
                                     }}
+                                    textContentType="username"
                                     autoCapitalize="none"
                                     placeholder="Email"
                                     style={styles.iconStyling}
                                     onChangeText={email => this.emailChanged(email)}
-                                    onSubmitEditing={() => { this.password.focus(); }}>
-                                </Input>
+                                    onSubmitEditing={() => { this.password.focus(); }}/>
                                 <Input
                                     leftIcon={{
                                         type: 'simple-line-icon',
@@ -242,12 +233,12 @@ export default class home extends Component {
                                         color: "grey"
                                     }}
                                     ref={(input) => { this.password = input; }}
+                                    textContentType="password"
                                     autoCapitalize="none"
                                     secureTextEntry={true}
                                     onChangeText={password => this.passwordChanged(password)}
                                     onSubmitEditing={() => { this.confirmPassword.focus(); }}
-                                    placeholder="Password">
-                                </Input>
+                                    placeholder="Password"/>
                                 <Input
                                     leftIcon={{
                                         type: 'simple-line-icon',
@@ -256,12 +247,12 @@ export default class home extends Component {
                                         size: 20,
                                         color: "grey"
                                     }}
+                                    textContentType="password"
                                     autoCapitalize="none"
                                     secureTextEntry={true}
                                     onChangeText={confirmPassword => this.confirmPasswordChanged(confirmPassword)}
                                     ref={(input) => { this.confirmPassword = input; }}
-                                    placeholder="Confirm Password">
-                                </Input>
+                                    placeholder="Confirm Password"/>
                                 <Text style={styles.incorrect}>
                                     {this.state.incorrectPassword}
                                 </Text>
@@ -272,6 +263,9 @@ export default class home extends Component {
                                     Sign Up
                                 </Text>
                             </TouchableOpacity>
+                            <View style={styles.activityIndicator}>
+                                {this.state.isLoading ? <ActivityIndicator /> : null}
+                            </View>
                         </View>
                         <View style={styles.signUpContainer}>
                             <Text style={styles.minorStyling}>Already signed up?</Text>
@@ -309,6 +303,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-evenly",
         flex: 0.2,
+
     },
     minorStyling: {
         fontSize: 16,
@@ -322,6 +317,8 @@ const styles = StyleSheet.create({
     img: {
         width: "40%",
         height: "40%",
+        marginTop: 50,
+        marginBottom: 20,
         alignSelf: "center",
         flex: 0.5
     },
@@ -329,6 +326,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#0E6BA8',
         borderRadius: 20,
         alignSelf: "center",
+    },
+    activityIndicator: {
+        alignSelf: "center",
+        height: 40,
     },
     signInTxt: {
         fontSize: 20,
@@ -341,7 +342,4 @@ const styles = StyleSheet.create({
         padding: 20,
         color: "grey"
     }
-
 });
-
-

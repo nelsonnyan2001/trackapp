@@ -1,5 +1,3 @@
-import React, { Component } from 'react';
-import { StyleSheet, Text, Button, Image, View, LayoutAnimation } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
 import Splash from './screens/splash'
@@ -16,9 +14,8 @@ const AppNavigator = createStackNavigator({
   Home: {
     screen: home,
     navigationOptions: {
-      headerLeft: () => null,
+      headerShown: false,
       gestureEnabled: false,
-      title: "Sign In"
     }
   }
 

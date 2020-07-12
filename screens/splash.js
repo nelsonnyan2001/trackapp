@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, Button, Image, View, LayoutAnimation } from 'react-native';
+import { StyleSheet, Text, StatusBar, Image, View, LayoutAnimation } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import Firebase from '../database/firebase_config'
 
 export default class Splash extends Component {
 
@@ -16,7 +16,7 @@ export default class Splash extends Component {
         setTimeout(() => {
             LayoutAnimation.spring()
             this.setState({ timeoutDone: "true" })
-        }, 2000);
+        }, 1000);
     }
 
     handleButtonPress() {
@@ -27,20 +27,22 @@ export default class Splash extends Component {
         if (!this.state.timeoutDone) {
             return (
                 <View style={styles.container}>
+                    <StatusBar hidden={true} />
                     <View style={styles.topContainer}>
                         <Image style={styles.img}
                             source={require('../assets/logo.png')}
                             resizeMode={"contain"} />
-                        <Text style = {styles.smalltext}> 
+                        <Text style={styles.smalltext}>
                             a pet project
                         </Text>
                     </View>
                 </View>
             );
-        }
+        } 
         else {
             return (
                 <View style={styles.container}>
+                    <StatusBar hidden={true} />
                     <View style={styles.topContainer}>
                         <Image style={styles.img}
                             source={require('../assets/logo.png')}
@@ -49,7 +51,7 @@ export default class Splash extends Component {
                             by @nelly_skrt
                         </Text>
                     </View>
-                    <View style = {styles.btn}>
+                    <View style={styles.btn}>
                         <TouchableOpacity
                             onPress={() => this.props.navigation.navigate('Home')}>
                             <Text style={styles.btnText}>
