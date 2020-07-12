@@ -205,6 +205,7 @@ export default class home extends Component {
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                     <KeyboardAvoidingView style={styles.container}
                         behavior="padding">
+                        <StatusBar hidden={true} />
                         <View style={styles.topContainer}>
                             <Image style={styles.img}
                                 source={require('../assets/logo.png')}
@@ -223,7 +224,7 @@ export default class home extends Component {
                                     placeholder="Email"
                                     style={styles.iconStyling}
                                     onChangeText={email => this.emailChanged(email)}
-                                    onSubmitEditing={() => { this.password.focus(); }}/>
+                                    onSubmitEditing={() => { this.password.focus(); }} />
                                 <Input
                                     leftIcon={{
                                         type: 'simple-line-icon',
@@ -238,7 +239,7 @@ export default class home extends Component {
                                     secureTextEntry={true}
                                     onChangeText={password => this.passwordChanged(password)}
                                     onSubmitEditing={() => { this.confirmPassword.focus(); }}
-                                    placeholder="Password"/>
+                                    placeholder="Password" />
                                 <Input
                                     leftIcon={{
                                         type: 'simple-line-icon',
@@ -252,7 +253,7 @@ export default class home extends Component {
                                     secureTextEntry={true}
                                     onChangeText={confirmPassword => this.confirmPasswordChanged(confirmPassword)}
                                     ref={(input) => { this.confirmPassword = input; }}
-                                    placeholder="Confirm Password"/>
+                                    placeholder="Confirm Password" />
                                 <Text style={styles.incorrect}>
                                     {this.state.incorrectPassword}
                                 </Text>
