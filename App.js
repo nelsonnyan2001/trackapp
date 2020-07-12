@@ -1,8 +1,8 @@
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
 import Splash from './screens/splash'
+import Authentication from './screens/authentication'
 import home from './screens/home'
-
 
 const AppNavigator = createStackNavigator({
   Splash: {
@@ -11,14 +11,20 @@ const AppNavigator = createStackNavigator({
       headerShown: false,
     }
   },
-  Home: {
-    screen: home,
+  Authentication: {
+    screen: Authentication,
     navigationOptions: {
       headerShown: false,
-      gestureEnabled: false,
     }
-  }
+  },
+  Home: {
+    screen: home,
+    navigationOptions:{
+      headerLeft : () => {false},
 
+    }
+
+  }
 });
 
 
