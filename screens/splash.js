@@ -49,7 +49,7 @@ export default class Splash extends Component {
                     console.log("Logged in")
                 }
                 else {
-                    console.log("Not logged in") 
+                    console.log("Not logged in")
                 }
             })
         }} />

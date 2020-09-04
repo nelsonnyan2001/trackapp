@@ -67,10 +67,12 @@ export default class Authentication extends Component {
                             onPress: () => console.log("Cancel Pressed"),
                             style: "cancel"
                         },
-                        { text: "OK", onPress: () => { 
-                            console.log("OK Pressed") 
-                            this.props.navigation.navigate("Splash")
-                        } }
+                        {
+                            text: "OK", onPress: () => {
+                                console.log("OK Pressed")
+                                this.props.navigation.navigate("Splash")
+                            }
+                        }
                     ],
                     { cancelable: false }
                 );

@@ -19,11 +19,9 @@ const AppNavigator = createStackNavigator({
   },
   Home: {
     screen: home,
-    navigationOptions:{
-      headerLeft : () => {false},
-
+    navigationOptions: {
+      headerLeft: () => { false },
     }
-
   }
 });
 
